@@ -1,5 +1,7 @@
 Projeto de jogo com gráficos 3D desenvolvido para a disciplina de Computer Graphics na UFABC.
 
+[link Disponível em WebAssembly](https://vinszrt.github.io/automatic-sniffle/public/)
+
 ### Aluno
 
 Vinicius Nunes Zorzetti
