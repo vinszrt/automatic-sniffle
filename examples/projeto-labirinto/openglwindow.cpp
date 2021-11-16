@@ -178,7 +178,7 @@ void OpenGLWindow::paintGL() {
     modelMatrix = glm::translate(modelMatrix, position);
     modelMatrix =
         glm::rotate(modelMatrix, glm::radians(0.0f), glm::vec3(0, 1, 0));
-    modelMatrix = glm::scale(modelMatrix, glm::vec3(0.9f, 1.6f, 0.9f));
+    modelMatrix = glm::scale(modelMatrix, glm::vec3(0.87f, 1.6f, 0.87f));
 
     // Set uniform variable
     abcg::glUniformMatrix4fv(modelMatrixLoc, 1, GL_FALSE, &modelMatrix[0][0]);

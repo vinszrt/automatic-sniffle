@@ -153,7 +153,7 @@ void Model::standardize() {
   }
 
   // Center and scale
-  const auto center{(min + max) / 10.0f};
+  const auto center{(min + max) / 2.0f};
   const auto scaling{2.0f / glm::length(max - min)};
   for (auto& vertex : m_vertices) {
     vertex.position = (vertex.position - center) * scaling;
