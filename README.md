@@ -15,13 +15,13 @@ Abaixo tem a imagem do labirinto, onde em azul é um dos caminhos para sair do l
 
 ### Controles
 
-Seta para frente ou W = Move para frente
+W ou Seta para frente = Move para frente
 
-Seta para tráz ou S = Move para trás
+W ou Seta para tráz = Move para trás
 
-Seta para esquerda ou A = Vira para esquerda
+A ou Seta para esquerda = Vira para esquerda
 
-Seta para a direita ou D = Vira para a direita
+D ou Seta para a direita = Vira para a direita
 
 Q = Anda lateralmente para esquerda
 
