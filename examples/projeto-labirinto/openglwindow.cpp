@@ -2,22 +2,25 @@
 
 #include <imgui.h>
 
+#include <algorithm>
 #include <cppitertools/itertools.hpp>
 #include <glm/fwd.hpp>
 #include <glm/gtx/fast_trigonometry.hpp>
 
+#include "camera.hpp"
+
 void OpenGLWindow::handleEvent(SDL_Event &ev) {
   if (ev.type == SDL_KEYDOWN) {
     if (ev.key.keysym.sym == SDLK_UP || ev.key.keysym.sym == SDLK_w)
-      m_dollySpeed = 1.0f;
+      m_dollySpeed = 1.5f;
     if (ev.key.keysym.sym == SDLK_DOWN || ev.key.keysym.sym == SDLK_s)
-      m_dollySpeed = -1.0f;
+      m_dollySpeed = -1.5f;
     if (ev.key.keysym.sym == SDLK_LEFT || ev.key.keysym.sym == SDLK_a)
-      m_panSpeed = -1.0f;
+      m_panSpeed = -1.5f;
     if (ev.key.keysym.sym == SDLK_RIGHT || ev.key.keysym.sym == SDLK_d)
-      m_panSpeed = 1.0f;
-    if (ev.key.keysym.sym == SDLK_q) m_truckSpeed = -1.0f;
-    if (ev.key.keysym.sym == SDLK_e) m_truckSpeed = 1.0f;
+      m_panSpeed = 1.5f;
+    if (ev.key.keysym.sym == SDLK_q) m_truckSpeed = -1.5f;
+    if (ev.key.keysym.sym == SDLK_e) m_truckSpeed = 1.5f;
   }
   if (ev.type == SDL_KEYUP) {
     if ((ev.key.keysym.sym == SDLK_UP || ev.key.keysym.sym == SDLK_w) &&
@@ -38,6 +41,14 @@ void OpenGLWindow::handleEvent(SDL_Event &ev) {
 }
 
 void OpenGLWindow::initializeGL() {
+  // Load a new font
+  ImGuiIO &io{ImGui::GetIO()};
+  auto filename{getAssetsPath() + "Inconsolata-Medium.ttf"};
+  m_font = io.Fonts->AddFontFromFileTTF(filename.c_str(), 60.0f);
+  if (m_font == nullptr) {
+    throw abcg::Exception{abcg::Exception::Runtime("Cannot load font file")};
+  }
+
   abcg::glClearColor(0, 0, 0, 1);
 
   // Enable depth buffering
@@ -60,11 +71,65 @@ void OpenGLWindow::initializeGL() {
 }
 
 void OpenGLWindow::loadMaze() {
-  auto *position = &(m_wallPositions.at(0));
-  *position = glm::vec3(-1.0f, 1.6f, 0.0f);
+  std::vector<glm::vec2> walls_positions = {
+      {-9.0f, -18.0f}, {-9.0f, -17.0f}, {-9.0f, -16.0f}, {-9.0f, -15.0f},
+      {-9.0f, -14.0f}, {-9.0f, -13.0f}, {-9.0f, -12.0f}, {-9.0f, -11.0f},
+      {-9.0f, -10.0f}, {-9.0f, -9.0f},  {-9.0f, -8.0f},  {-9.0f, -7.0f},
+      {-9.0f, -6.0f},  {-9.0f, -5.0f},  {-9.0f, -4.0f},  {-9.0f, -3.0f},
+      {-9.0f, -2.0f},  {-9.0f, -1.0f},  {-9.0f, -0.0f},  {-8.0f, -18.0f},
+      {-8.0f, -0.0f},  {-7.0f, -18.0f}, {-7.0f, -16.0f}, {-7.0f, -15.0f},
+      {-7.0f, -14.0f}, {-7.0f, -12.0f}, {-7.0f, -11.0f}, {-7.0f, -10.0f},
+      {-7.0f, -9.0f},  {-7.0f, -7.0f},  {-7.0f, -6.0f},  {-7.0f, -4.0f},
+      {-7.0f, -3.0f},  {-7.0f, -2.0f},  {-7.0f, -0.0f},  {-6.0f, -18.0f},
+      {-6.0f, -16.0f}, {-6.0f, -9.0f},  {-6.0f, -4.0f},  {-6.0f, -2.0f},
+      {-6.0f, -0.0f},  {-5.0f, -18.0f}, {-5.0f, -16.0f}, {-5.0f, -14.0f},
+      {-5.0f, -13.0f}, {-5.0f, -12.0f}, {-5.0f, -11.0f}, {-5.0f, -9.0f},
+      {-5.0f, -8.0f},  {-5.0f, -7.0f},  {-5.0f, -6.0f},  {-5.0f, -4.0f},
+      {-5.0f, -2.0f},  {-5.0f, -1.0f},  {-5.0f, -0.0f},  {-4.0f, -18.0f},
+      {-4.0f, -16.0f}, {-4.0f, -14.0f}, {-4.0f, -12.0f}, {-4.0f, -11.0f},
+      {-4.0f, -0.0f},  {-3.0f, -18.0f}, {-3.0f, -16.0f}, {-3.0f, -14.0f},
+      {-3.0f, -11.0f}, {-3.0f, -9.0f},  {-3.0f, -7.0f},  {-3.0f, -6.0f},
+      {-3.0f, -5.0f},  {-3.0f, -4.0f},  {-3.0f, -3.0f},  {-3.0f, -2.0f},
+      {-3.0f, -0.0f},  {-2.0f, -18.0f}, {-2.0f, -14.0f}, {-2.0f, -12.0f},
+      {-2.0f, -11.0f}, {-2.0f, -9.0f},  {-2.0f, -7.0f},  {-2.0f, -2.0f},
+      {-2.0f, -1.0f},  {-2.0f, -0.0f},  {-1.0f, -18.0f}, {-1.0f, -17.0f},
+      {-1.0f, -16.0f}, {-1.0f, -11.0f}, {-1.0f, -9.0f},  {-1.0f, -7.0f},
+      {-1.0f, -5.0f},  {-1.0f, -4.0f},  {-1.0f, -2.0f},  {-1.0f, -1.0f},
+      {-1.0f, -0.0f},  {0.0f, -14.0f},  {0.0f, -13.0f},  {0.0f, -11.0f},
+      {0.0f, -9.0f},   {0.0f, -7.0f},   {0.0f, -5.0f},   {1.0f, -18.0f},
+      {1.0f, -17.0f},  {1.0f, -15.0f},  {1.0f, -14.0f},  {1.0f, -13.0f},
+      {1.0f, -12.0f},  {1.0f, -11.0f},  {1.0f, -9.0f},   {1.0f, -7.0f},
+      {1.0f, -5.0f},   {1.0f, -3.0f},   {1.0f, -2.0f},   {1.0f, -1.0f},
+      {1.0f, -0.0f},   {2.0f, -18.0f},  {2.0f, -17.0f},  {2.0f, -15.0f},
+      {2.0f, -13.0f},  {2.0f, -9.0f},   {2.0f, -7.0f},   {2.0f, -5.0f},
+      {2.0f, -0.0f},   {3.0f, -18.0f},  {3.0f, -13.0f},  {3.0f, -11.0f},
+      {3.0f, -10.0f},  {3.0f, -9.0f},   {3.0f, -7.0f},   {3.0f, -5.0f},
+      {3.0f, -4.0f},   {3.0f, -2.0f},   {3.0f, -0.0f},   {4.0f, -18.0f},
+      {4.0f, -16.0f},  {4.0f, -14.0f},  {4.0f, -13.0f},  {4.0f, -11.0f},
+      {4.0f, -5.0f},   {4.0f, -4.0f},   {4.0f, -2.0f},   {4.0f, -0.0f},
+      {5.0f, -18.0f},  {5.0f, -16.0f},  {5.0f, -14.0f},  {5.0f, -13.0f},
+      {5.0f, -11.0f},  {5.0f, -9.0f},   {5.0f, -8.0f},   {5.0f, -7.0f},
+      {5.0f, -5.0f},   {5.0f, -2.0f},   {5.0f, -0.0f},   {6.0f, -18.0f},
+      {6.0f, -17.0f},  {6.0f, -16.0f},  {6.0f, -14.0f},  {6.0f, -13.0f},
+      {6.0f, -5.0f},   {6.0f, -3.0f},   {6.0f, -2.0f},   {6.0f, -0.0f},
+      {7.0f, -18.0f},  {7.0f, -13.0f},  {7.0f, -12.0f},  {7.0f, -11.0f},
+      {7.0f, -9.0f},   {7.0f, -8.0f},   {7.0f, -7.0f},   {7.0f, -6.0f},
+      {7.0f, -5.0f},   {7.0f, -3.0f},   {7.0f, -2.0f},   {7.0f, -0.0f},
+      {8.0f, -18.0f},  {8.0f, -16.0f},  {8.0f, -15.0f},  {8.0f, -9.0f},
+      {8.0f, -8.0f},   {8.0f, -3.0f},   {8.0f, -0.0f},   {9.0f, -18.0f},
+      {9.0f, -17.0f},  {9.0f, -16.0f},  {9.0f, -15.0f},  {9.0f, -14.0f},
+      {9.0f, -13.0f},  {9.0f, -12.0f},  {9.0f, -11.0f},  {9.0f, -10.0f},
+      {9.0f, -9.0f},   {9.0f, -8.0f},   {9.0f, -7.0f},   {9.0f, -6.0f},
+      {9.0f, -5.0f},   {9.0f, -4.0f},   {9.0f, -3.0f},   {9.0f, -2.0f},
+      {9.0f, -1.0f},   {9.0f, -0.0f}};
 
-  position = &(m_wallPositions.at(1));
-  *position = glm::vec3(1.0f, 1.6f, 0.0f);
+  auto *position = &(m_wallPositions.at(0));
+
+  for (unsigned long i = 0; i < walls_positions.size(); i++) {
+    position = &(m_wallPositions.at(i));
+    *position =
+        glm::vec3(walls_positions.at(i)[0], 0.8f, walls_positions.at(i)[1]);
+  }
 }
 
 void OpenGLWindow::paintGL() {
@@ -102,11 +167,11 @@ void OpenGLWindow::paintGL() {
     modelMatrix = glm::translate(modelMatrix, position);
     modelMatrix =
         glm::rotate(modelMatrix, glm::radians(0.0f), glm::vec3(0, 1, 0));
-    modelMatrix = glm::scale(modelMatrix, glm::vec3(1.0f, 3.2f, 1.0f));
+    modelMatrix = glm::scale(modelMatrix, glm::vec3(0.9f, 1.6f, 0.9f));
 
     // Set uniform variable
     abcg::glUniformMatrix4fv(modelMatrixLoc, 1, GL_FALSE, &modelMatrix[0][0]);
-    abcg::glUniform4f(colorLoc, 1.0f, 1.0f, 1.0f, 1.0f);
+    abcg::glUniform4f(colorLoc, 1.0f, 1.0f, 0.4f, 1.0f);
 
     m_model.render();
   }
@@ -117,52 +182,29 @@ void OpenGLWindow::paintGL() {
   abcg::glUseProgram(0);
 }
 
-void OpenGLWindow::paintUI() { abcg::OpenGLWindow::paintUI(); }
-
-/*void OpenGLWindow::paintUI() {
+void OpenGLWindow::paintUI() {
   abcg::OpenGLWindow::paintUI();
 
   {
-    const auto widgetSize{ImVec2(218, 62)};
-    ImGui::SetNextWindowPos(ImVec2(m_viewportWidth - widgetSize.x - 5, 5));
-    ImGui::SetNextWindowSize(widgetSize);
-    ImGui::Begin("Widget window", nullptr, ImGuiWindowFlags_NoDecoration);
+    const auto size{ImVec2(300, 85)};
+    const auto position{ImVec2(((float)m_viewportWidth - size.x) / 2.0f,
+                               ((float)m_viewportHeight - size.y) / 2.0f)};
+    ImGui::SetNextWindowPos(position);
+    ImGui::SetNextWindowSize(size);
+    ImGuiWindowFlags flags{ImGuiWindowFlags_NoBackground |
+                           ImGuiWindowFlags_NoTitleBar |
+                           ImGuiWindowFlags_NoInputs};
+    ImGui::Begin(" ", nullptr, flags);
+    ImGui::PushFont(m_font);
 
-    {
-      ImGui::PushItemWidth(120);
-      static std::size_t currentIndex{};
-      const std::vector<std::string> comboItems{"Perspective", "Orthographic"};
-
-      if (ImGui::BeginCombo("Projection",
-                            comboItems.at(currentIndex).c_str())) {
-        for (const auto index : iter::range(comboItems.size())) {
-          const bool isSelected{currentIndex == index};
-          if (ImGui::Selectable(comboItems.at(index).c_str(), isSelected))
-            currentIndex = index;
-          if (isSelected) ImGui::SetItemDefaultFocus();
-        }
-        ImGui::EndCombo();
-      }
-      ImGui::PopItemWidth();
-
-      ImGui::PushItemWidth(170);
-      const auto aspect{static_cast<float>(m_viewportWidth) /
-                        static_cast<float>(m_viewportHeight)};
-      if (currentIndex == 0) {
-        m_projMatrix =
-            glm::perspective(glm::radians(m_FOV), aspect, 0.01f, 100.0f);
-
-        ImGui::SliderFloat("FOV", &m_FOV, 5.0f, 179.0f, "%.0f degrees");
-      } else {
-        m_projMatrix = glm::ortho(-20.0f * aspect, 20.0f * aspect, -20.0f,
-                                  20.0f, 0.01f, 100.0f);
-      }
-      ImGui::PopItemWidth();
+    if (m_gameData.m_state == State::Win) {
+      ImGui::Text("*You Win!*");
     }
 
+    ImGui::PopFont();
     ImGui::End();
   }
-}*/
+}
 
 void OpenGLWindow::resizeGL(int width, int height) {
   m_viewportWidth = width;
@@ -180,8 +222,34 @@ void OpenGLWindow::terminateGL() {
 void OpenGLWindow::update() {
   const float deltaTime{static_cast<float>(getDeltaTime())};
 
+  // Wait 5 seconds before restarting
+  if (m_gameData.m_state == State::Win && m_restartWaitTimer.elapsed() > 5) {
+    restart();
+    return;
+  }
+
+  if (m_gameData.m_state == State::Playing) {
+    makeMovement(deltaTime);
+    checkWinCondition();
+  }
+}
+
+void OpenGLWindow::makeMovement(const float deltaTime) {
   // Update LookAt camera
   m_camera.dolly(m_dollySpeed * deltaTime, m_wallPositions);
   m_camera.truck(m_truckSpeed * deltaTime, m_wallPositions);
   m_camera.pan(m_panSpeed * deltaTime);
+}
+
+void OpenGLWindow::checkWinCondition() {
+  if (m_camera.m_eye[2] < -19.0f) {
+    m_gameData.m_state = State::Win;
+    m_restartWaitTimer.restart();
+  }
+}
+
+void OpenGLWindow::restart() {
+  m_gameData.m_state = State::Playing;
+
+  m_camera.restart();
 }

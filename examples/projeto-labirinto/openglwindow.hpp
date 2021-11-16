@@ -5,7 +5,9 @@
 
 #include "abcg.hpp"
 #include "camera.hpp"
+#include "gamedata.hpp"
 #include "ground.hpp"
+#include "imgui.h"
 #include "model.hpp"
 
 class OpenGLWindow : public abcg::OpenGLWindow {
@@ -18,9 +20,13 @@ class OpenGLWindow : public abcg::OpenGLWindow {
   void terminateGL() override;
 
  private:
-  static const int m_walls{2};
+  static const int m_walls{198};
 
   GLuint m_program{};
+
+  GameData m_gameData;
+  abcg::ElapsedTimer m_restartWaitTimer;
+  ImFont* m_font{};
 
   int m_viewportWidth{};
   int m_viewportHeight{};
@@ -40,6 +46,9 @@ class OpenGLWindow : public abcg::OpenGLWindow {
 
   void loadMaze();
   void update();
+  void restart();
+  void makeMovement(float);
+  void checkWinCondition();
 };
 
 #endif
