@@ -9,7 +9,7 @@ Vinicius Nunes Zorzetti
 
 O jogo é um labirinto em 3D no qual o jogador começa de um lado do labirinto e tem que chegar do outro lado para vencer.
 
-Abaixo tem a imagem do labirinto.
+Abaixo tem a imagem do labirinto, onde em azul é um dos caminhos para sair do labiritinto. (No jogo, considera-se que o usuário está na parte de baixo do labirinto e tem que chegar no topo).
 
 ![alt Labirinto](public/maze.png "Maze")
 
