@@ -42,26 +42,29 @@ void Camera::dolly(float speed, std::array<glm::vec3, SIZE> m_wallPositions) {
   // Compute forward vector (view direction)
   const glm::vec3 forward{glm::normalize(m_at - m_eye)};
 
-  const glm::vec3 m_next_eye = m_eye + forward * speed;
-  const glm::vec2 proj_eye = {m_next_eye[0], m_next_eye[2]};
+  const glm::vec3 m_next_eye =
+      m_eye + forward * speed;  // Posição para onde a camera irá caso se mova
+  const glm::vec2 proj_eye = {
+      m_next_eye[0], m_next_eye[2]};  // Projeção da posição da camera no chão
 
-  glm::vec2 proj_wall;
-  int collision = 0;
+  glm::vec2 proj_wall;  // Projeção da posição de um bloco de parede no chão
+  int collision = 0;    // Identificador de colisão
 
-  // Check each wall to see if will collide
+  // Para cada parede, verifica se a nova posição da camera estará em colisão
+  // com alguma parede
   for (long unsigned int i = 0; i < m_wallPositions.size(); i++) {
     proj_wall = {m_wallPositions.at(i)[0], m_wallPositions.at(i)[2]};
 
     if (glm::distance(proj_eye, proj_wall) < 0.71) {
-      collision = 1;
+      collision = 1;  // Colidiu
     }
   }
 
-  // Check if camera is out of maze
+  // Verifica se a camera sairá do labirinto
   if (m_next_eye[0] > 9 || m_next_eye[0] < -9) collision = 1;
 
-  // Move eye and center forward (speed > 0) or backward (speed < 0) if not
-  // collided
+  // Move eye and center forward (speed > 0) or backward (speed < 0) se não
+  // houve colisão
   if (collision == 0) {
     m_eye += forward * speed;
     m_at += forward * speed;
@@ -77,23 +80,29 @@ void Camera::truck(float speed, std::array<glm::vec3, SIZE> m_wallPositions) {
   // Compute vector to the left
   const glm::vec3 left{glm::cross(m_up, forward)};
 
-  const glm::vec3 m_next_eye = m_eye - left * speed;
-  const glm::vec2 proj_eye = {m_next_eye[0], m_next_eye[2]};
+  const glm::vec3 m_next_eye =
+      m_eye - left * speed;  // Posição para onde a camera irá caso se mova
+  const glm::vec2 proj_eye = {
+      m_next_eye[0], m_next_eye[2]};  // Projeção da posição da camera no chão
 
-  glm::vec2 proj_wall;
-  int collision = 0;
+  glm::vec2 proj_wall;  // Projeção da posição do bloco de parede no chão
+  int collision = 0;    // identificador de colisão
 
-  // Check each wall to see if will collide
+  // Para cada parede, verifica se a nova posição da camera estará em colisão
+  // com alguma parede
   for (long unsigned int i = 0; i < m_wallPositions.size(); i++) {
     proj_wall = {m_wallPositions.at(i)[0], m_wallPositions.at(i)[2]};
 
     if (glm::distance(proj_eye, proj_wall) < 0.71) {
-      collision = 1;
+      collision = 1;  // Colidiu
     }
   }
 
-  // Move eye and center to the left (speed < 0) or to the right (speed > 0) if
-  // not collided
+  // Verifica se a camera sairá do labirinto
+  if (m_next_eye[0] > 9 || m_next_eye[0] < -9) collision = 1;
+
+  // Move eye and center to the left (speed < 0) or to the right (speed > 0) se
+  // não houver colisão
   if (collision == 0) {
     m_eye -= left * speed;
     m_at -= left * speed;

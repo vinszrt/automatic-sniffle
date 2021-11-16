@@ -38,8 +38,6 @@ class OpenGLWindow : public abcg::OpenGLWindow {
 
   Ground m_ground;
 
-  // std::default_random_engine m_randomEngine;
-
   Model m_model;
 
   std::array<glm::vec3, m_walls> m_wallPositions;

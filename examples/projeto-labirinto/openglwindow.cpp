@@ -9,6 +9,10 @@
 
 #include "camera.hpp"
 
+// Controle o uso do teclado para controlar o movimento dentro do labirinto
+// Teclas UP, DOWN, W, S controlam movimento para frente e pra tras.
+// Teclas Q, E movimenta lateralmente.
+// Teclas LEFT, RIGHT giram a camera.
 void OpenGLWindow::handleEvent(SDL_Event &ev) {
   if (ev.type == SDL_KEYDOWN) {
     if (ev.key.keysym.sym == SDLK_UP || ev.key.keysym.sym == SDLK_w)
@@ -66,11 +70,17 @@ void OpenGLWindow::initializeGL() {
 
   m_model.setupVAO(m_program);
 
-  // Setup stars
+  // Setup maze walls
   loadMaze();
 }
 
+// Carrega as paredes que compõe o labirinto
+// Considerando uma grade 19x19 e
+// Considerando um bloco 1x1
+// Se uma posição x,y da grade contém parede, um bloco é inserido centrado na
+// posição
 void OpenGLWindow::loadMaze() {
+  // Representa os blocos que compõe o labirinto e suas posições
   std::vector<glm::vec2> walls_positions = {
       {-9.0f, -18.0f}, {-9.0f, -17.0f}, {-9.0f, -16.0f}, {-9.0f, -15.0f},
       {-9.0f, -14.0f}, {-9.0f, -13.0f}, {-9.0f, -12.0f}, {-9.0f, -11.0f},
@@ -125,6 +135,7 @@ void OpenGLWindow::loadMaze() {
 
   auto *position = &(m_wallPositions.at(0));
 
+  // Insere os blocos nas posições
   for (unsigned long i = 0; i < walls_positions.size(); i++) {
     position = &(m_wallPositions.at(i));
     *position =
@@ -197,6 +208,7 @@ void OpenGLWindow::paintUI() {
     ImGui::Begin(" ", nullptr, flags);
     ImGui::PushFont(m_font);
 
+    // Se jogador chegou ao fim do labirinto, exibe *You Win!*
     if (m_gameData.m_state == State::Win) {
       ImGui::Text("*You Win!*");
     }
@@ -241,6 +253,7 @@ void OpenGLWindow::makeMovement(const float deltaTime) {
   m_camera.pan(m_panSpeed * deltaTime);
 }
 
+// Verifica se o jogador chegou ao fim do labirinto
 void OpenGLWindow::checkWinCondition() {
   if (m_camera.m_eye[2] < -19.0f) {
     m_gameData.m_state = State::Win;

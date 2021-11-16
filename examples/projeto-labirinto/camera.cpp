@@ -18,8 +18,9 @@ void Camera::computeViewMatrix() {
   m_viewMatrix = glm::lookAt(m_eye, m_at, m_up);
 }
 
-// Camera::dolly and Camera::truck in header file (camera.hpp) because of the
-// use of Template Function
+// Camera::dolly e Camera::truck no header file (camera.hpp) pois foi necessário
+// usar template para poderem receber array de qualquer tamanho (n. de blocos
+// das paredes do labirinto)
 
 void Camera::pan(float speed) {
   glm::mat4 transform{glm::mat4(1.0f)};
